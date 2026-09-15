@@ -1,0 +1,33 @@
+name: Foundation Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            apps/web/package.json
+            apps/api/package.json
+            packages/contracts/package.json
+      - name: Install web dependencies
+        run: npm install --prefix apps/web
+      - name: Install API dependencies
+        run: npm install --prefix apps/api
+      - name: Install contracts dependencies
+        run: npm install --prefix packages/contracts
+      - name: Typecheck web
+        run: npm --prefix apps/web run typecheck
+      - name: Typecheck API
+        run: npm --prefix apps/api run typecheck
+      - name: Typecheck contracts
+        run: npm --prefix packages/contracts run typecheck
